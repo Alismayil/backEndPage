@@ -2,13 +2,14 @@ import express from "express";
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cors from "cors";
 
 const app = express();
 const port = 4000;
 const privateKey="ehmedoglan"
 
 app.use(express.json());
-// app.use(cors())
+app.use(cors())
 
 const Userschema = new Schema({
   username: String,
@@ -35,6 +36,10 @@ app.get("/users/:id", async (req, res) => {
 
 app.post("/register", async (req, res) => {
   try {
+    const userExist=await Users.findOne({ username: req.body.username})
+    if (userExist) {
+      return res.status(200).send("Already have User")
+  }
     const hashPassword = await bcrypt.hash(req.body.password, 10);
     const data = new Users({
       username: req.body.username,
