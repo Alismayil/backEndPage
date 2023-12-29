@@ -67,13 +67,14 @@ app.post("/login", async (req, res) => {
     try {
         const {username, password} = req.body
         const userExist=await Users.findOne({ username: username})
+        console.log(userExist);
         if (!userExist || !(await bcrypt.compare(password, userExist.password))) {
-            return res.status(200).send("Wrong User")
+            return res.status(404).send("Wrong User")
         }
-        const token = jwt.sign({ userId:req.body._id ,username: req.body.username, role: req.body.role }, privateKey, {expiresIn:"1h"});
+        const token = jwt.sign({ userId:req.body._id ,username: req.body.username, role: userExist.role }, privateKey, {expiresIn:"1h"});
         res.send(token)
     } catch (error) {
-      res.status(200).send(error);
+      res.status(404).send(error);
     }
   });
 
